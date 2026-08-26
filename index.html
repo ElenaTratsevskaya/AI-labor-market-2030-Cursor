@@ -46,16 +46,16 @@
     /* Exact Power BI canvas — scaled to fit the viewport */
     .stage {
       position: absolute;
-      left: 50%;
-      top: 50%;
+      left: 0;
+      top: 0;
       width: var(--sheet-w);
       height: var(--sheet-h);
       background: #f3ecda;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      transform-origin: center center;
-      transform: translate(-50%, -50%) scale(1);
+      transform-origin: top left;
+      transform: scale(1);
     }
 
     .topbar {
@@ -1156,8 +1156,15 @@
     if (!stage) return;
     const sw = 1920;
     const sh = 1080;
-    const scale = Math.min(window.innerWidth / sw, window.innerHeight / sh);
-    stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    const vw = window.visualViewport ? window.visualViewport.width : document.documentElement.clientWidth;
+    const vh = window.visualViewport ? window.visualViewport.height : document.documentElement.clientHeight;
+    const scale = Math.min(vw / sw, vh / sh);
+    const left = Math.max(0, (vw - sw * scale) / 2);
+    const top = Math.max(0, (vh - sh * scale) / 2);
+    stage.style.transformOrigin = 'top left';
+    stage.style.transform = `scale(${scale})`;
+    stage.style.left = left + 'px';
+    stage.style.top = top + 'px';
   }
 
   function scheduleResize() {
@@ -1972,6 +1979,9 @@
       bindFilters();
       fitStageToViewport();
       window.addEventListener('resize', scheduleResize);
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', scheduleResize);
+      }
       refresh();
       scheduleResize();
     } catch (err) {
