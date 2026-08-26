@@ -40,20 +40,22 @@
     }
 
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      position: relative;
     }
 
-    /* Exact Power BI canvas — nothing outside */
+    /* Exact Power BI canvas — scaled to fit the viewport */
     .stage {
+      position: absolute;
+      left: 50%;
+      top: 50%;
       width: var(--sheet-w);
       height: var(--sheet-h);
       background: #f3ecda;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      flex-shrink: 0;
+      transform-origin: center center;
+      transform: translate(-50%, -50%) scale(1);
     }
 
     .topbar {
@@ -1149,8 +1151,18 @@
     el.style.height = h + 'px';
   }
 
+  function fitStageToViewport() {
+    const stage = document.getElementById('app');
+    if (!stage) return;
+    const sw = 1920;
+    const sh = 1080;
+    const scale = Math.min(window.innerWidth / sw, window.innerHeight / sh);
+    stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+  }
+
   function scheduleResize() {
     requestAnimationFrame(() => {
+      fitStageToViewport();
       sizeRadarSquare();
       resizeAllEc();
       Object.keys(charts).forEach(id => {
@@ -1958,8 +1970,10 @@
       fillMulti(document.getElementById('f-ind'), [...new Set(allRows.map(r => r.Industry))]);
       fillMulti(document.getElementById('f-cty'), [...new Set(allRows.map(r => r.Country))]);
       bindFilters();
+      fitStageToViewport();
       window.addEventListener('resize', scheduleResize);
       refresh();
+      scheduleResize();
     } catch (err) {
       document.querySelector('.content').innerHTML =
         `<div class="load-error"><strong>Could not load data.</strong><br>
