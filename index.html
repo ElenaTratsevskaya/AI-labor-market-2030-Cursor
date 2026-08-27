@@ -37,13 +37,17 @@
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       background: #111;
       color: var(--c-navy);
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
 
     body {
-      position: relative;
+      position: fixed;
+      inset: 0;
+      margin: 0;
     }
 
-    /* Exact Power BI canvas — scaled to fit the viewport */
+    /* Exact Power BI canvas — CSS scale on first paint, JS refines */
     .stage {
       position: absolute;
       left: 0;
@@ -54,8 +58,14 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      transform-origin: top left;
-      transform: scale(1);
+      transform-origin: 0 0;
+      -webkit-transform-origin: 0 0;
+      transform: scale(calc(100vw / 1920));
+      -webkit-transform: scale(calc(100vw / 1920));
+      transform: scale(min(calc(100vw / 1920), calc(100vh / 1080)));
+      -webkit-transform: scale(min(calc(100vw / 1920), calc(100vh / 1080)));
+      transform: scale(min(calc(100vw / 1920), calc(100dvh / 1080), calc(100vh / 1080)));
+      -webkit-transform: scale(min(calc(100vw / 1920), calc(100dvh / 1080), calc(100vh / 1080)));
     }
 
     .topbar {
@@ -730,9 +740,56 @@
       line-height: 1.5;
     }
   </style>
+  <script>
+    window.fitDashboardStage = function () {
+      var stage = document.getElementById('app');
+      if (!stage) return;
+      var sw = 1920, sh = 1080;
+      var vv = window.visualViewport;
+      var vw = Math.min(
+        window.innerWidth || Infinity,
+        document.documentElement.clientWidth || Infinity,
+        vv && vv.width ? vv.width : Infinity
+      );
+      var vh = Math.min(
+        window.innerHeight || Infinity,
+        document.documentElement.clientHeight || Infinity,
+        vv && vv.height ? vv.height : Infinity
+      );
+      if (!isFinite(vw) || !isFinite(vh) || vw < 1 || vh < 1) return;
+      var scale = Math.min(vw / sw, vh / sh) * 0.995;
+      var left = Math.max(0, (vw - sw * scale) / 2);
+      var top = Math.max(0, (vh - sh * scale) / 2);
+      stage.style.transformOrigin = '0 0';
+      stage.style.webkitTransformOrigin = '0 0';
+      stage.style.transform = 'scale(' + scale + ')';
+      stage.style.webkitTransform = 'scale(' + scale + ')';
+      stage.style.left = left + 'px';
+      stage.style.top = top + 'px';
+    };
+    window.scheduleDashboardFit = function () {
+      requestAnimationFrame(function () {
+        window.fitDashboardStage();
+        requestAnimationFrame(window.fitDashboardStage);
+      });
+    };
+    window.addEventListener('resize', window.scheduleDashboardFit);
+    window.addEventListener('orientationchange', function () {
+      window.scheduleDashboardFit();
+      setTimeout(window.scheduleDashboardFit, 80);
+      setTimeout(window.scheduleDashboardFit, 320);
+    });
+    window.addEventListener('pageshow', window.scheduleDashboardFit);
+    window.addEventListener('load', window.scheduleDashboardFit);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', window.scheduleDashboardFit);
+      window.visualViewport.addEventListener('scroll', window.scheduleDashboardFit);
+    }
+  </script>
 </head>
 <body>
   <div class="stage" id="app">
+  <script>window.fitDashboardStage();</script>
     <div class="topbar">
       <div class="topbar-brand">AI × Labor 2030</div>
       <div class="topbar-nav">
@@ -1152,28 +1209,19 @@
   }
 
   function fitStageToViewport() {
-    const stage = document.getElementById('app');
-    if (!stage) return;
-    const sw = 1920;
-    const sh = 1080;
-    const vw = window.visualViewport ? window.visualViewport.width : document.documentElement.clientWidth;
-    const vh = window.visualViewport ? window.visualViewport.height : document.documentElement.clientHeight;
-    const scale = Math.min(vw / sw, vh / sh);
-    const left = Math.max(0, (vw - sw * scale) / 2);
-    const top = Math.max(0, (vh - sh * scale) / 2);
-    stage.style.transformOrigin = 'top left';
-    stage.style.transform = `scale(${scale})`;
-    stage.style.left = left + 'px';
-    stage.style.top = top + 'px';
+    if (window.fitDashboardStage) window.fitDashboardStage();
   }
 
   function scheduleResize() {
     requestAnimationFrame(() => {
       fitStageToViewport();
-      sizeRadarSquare();
-      resizeAllEc();
-      Object.keys(charts).forEach(id => {
-        if (charts[id] && charts[id].resize) charts[id].resize();
+      requestAnimationFrame(() => {
+        fitStageToViewport();
+        sizeRadarSquare();
+        resizeAllEc();
+        Object.keys(charts).forEach(id => {
+          if (charts[id] && charts[id].resize) charts[id].resize();
+        });
       });
     });
   }
@@ -1984,6 +2032,9 @@
       }
       refresh();
       scheduleResize();
+      setTimeout(scheduleResize, 80);
+      setTimeout(scheduleResize, 300);
+      setTimeout(scheduleResize, 800);
     } catch (err) {
       document.querySelector('.content').innerHTML =
         `<div class="load-error"><strong>Could not load data.</strong><br>
@@ -1991,6 +2042,7 @@
     }
   }
 
+  fitStageToViewport();
   init();
 })();
   </script>
