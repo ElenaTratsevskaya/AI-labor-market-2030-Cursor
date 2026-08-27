@@ -1756,7 +1756,7 @@
 
     const byJobRisk = [...groupBy(data, 'Job_Title').entries()].map(([k, rows]) => ({
       k, risk: avg(rows, 'AI_Replacement_Risk')
-    })).sort((a, b) => b.risk - a.risk).slice(0, 10).reverse();
+    })).sort((a, b) => b.risk - a.risk).slice(0, 10);
 
     destroyChart('riskJob');
     charts.riskJob = new Chart(document.getElementById('c-risk-job'), {
