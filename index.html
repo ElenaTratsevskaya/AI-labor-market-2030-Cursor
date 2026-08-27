@@ -365,57 +365,11 @@
       flex: 1.1 1 0;
     }
 
-    .split-radar {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 1fr max-content;
-      gap: 8px;
-      min-height: 0;
-      min-width: 0;
-      align-items: stretch;
-    }
-
     .radar-sq {
       width: 100%;
       height: 100%;
       min-width: 0;
       min-height: 0;
-    }
-
-    .radar-sq .echart {
-      top: 12px;
-    }
-
-    .split-radar .legend-box {
-      flex: 0 0 auto;
-      width: max-content;
-      max-width: none;
-      justify-content: center;
-      align-items: flex-end;
-      overflow: visible;
-      font-size: 12px;
-      text-align: right;
-      border-left: 1px solid var(--c-cream-3);
-      padding-left: 8px;
-      padding-right: 6px;
-    }
-
-    .split-radar .legend-item {
-      justify-content: flex-end;
-      text-align: right;
-      white-space: nowrap;
-      width: 100%;
-    }
-
-    .split-radar .legend-item span:first-child {
-      display: block;
-      text-align: right;
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-
-    .split-radar .legend-swatch {
-      margin-top: 3px;
     }
 
     .s1-flow {
@@ -482,11 +436,19 @@
       height: 100% !important;
     }
 
-    .split-legend {
-      flex: 1;
+    .panel-scatter {
       display: grid;
-      grid-template-columns: 1fr 140px;
-      gap: 6px;
+      grid-template-columns: 1fr 132px;
+      grid-template-rows: auto auto 1fr;
+      column-gap: 6px;
+    }
+
+    .panel-scatter h3 { grid-column: 1; grid-row: 1; }
+    .panel-scatter .panel-sub { grid-column: 1; grid-row: 2; }
+    .panel-scatter .chart-wrap {
+      grid-column: 1;
+      grid-row: 3;
+      height: 100%;
       min-height: 0;
     }
 
@@ -502,18 +464,54 @@
       gap: 4px;
     }
 
-    /* Scatter legend unchanged (keep smaller) */
-    .legend-box.scrollable {
+    .panel-scatter .legend-box {
+      grid-column: 2;
+      grid-row: 1 / -1;
       justify-content: flex-start;
-      overflow: auto;
+      overflow: hidden;
       font-size: 10px;
-      line-height: 1.3;
+      line-height: 1.2;
+      gap: 1px;
+      padding-top: 0;
+    }
+
+    .panel-scatter .legend-item {
+      align-items: center;
+    }
+
+    .panel-scatter .legend-swatch {
+      margin-top: 0;
     }
 
     .legend-item {
       display: flex;
       align-items: flex-start;
       gap: 5px;
+    }
+
+    .legend-box.legend-top {
+      flex: 0 0 auto;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 4px 14px;
+      overflow: hidden;
+      font-size: 12px;
+      line-height: 1.2;
+      border-left: none;
+      padding: 2px 0 6px;
+      max-height: 36px;
+    }
+
+    .legend-box.legend-top .legend-item {
+      align-items: center;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .legend-box.legend-top .legend-swatch {
+      margin-top: 0;
     }
 
     .legend-swatch {
@@ -527,13 +525,21 @@
 
     .legend-swatch.sq { border-radius: 2px; }
 
+    .s1-edu-night-row {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+
     .s1-edu-rose {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1.22fr 0.78fr;
       gap: var(--gap);
       min-height: 0;
       min-width: 0;
       height: 100%;
+    }
+
+    .panel-edu h3 {
+      white-space: nowrap;
     }
 
     .pair-charts {
@@ -675,7 +681,10 @@
     }
 
     table.data-table th:first-child,
-    table.data-table td:first-child,
+    table.data-table td:first-child {
+      text-align: left;
+    }
+
     table.data-table th:last-child,
     table.data-table td:last-child {
       text-align: center;
@@ -944,14 +953,16 @@
           </div>
           <div class="kpi-row kpi-6" id="s1-kpi"></div>
           <div class="charts-stack">
-            <div class="grid-row cols-opp">
+            <div class="grid-row cols-opp s1-edu-night-row">
               <div class="s1-edu-rose">
-                <div class="panel">
+                <div class="panel panel-edu">
                   <h3>Education Level — Avg Replacement Risk vs Job Growth</h3>
+                  <div class="legend-box legend-top" id="edu-legend"></div>
                   <div class="chart-wrap"><canvas id="c-edu"></canvas></div>
                 </div>
                 <div class="panel">
                   <h3>AI Replacement Risk (Nightingale, n roles)</h3>
+                  <div class="legend-box legend-top" id="rose-legend"></div>
                   <div class="chart-wrap"><div id="e-rose" class="echart"></div></div>
                 </div>
               </div>
@@ -969,18 +980,14 @@
             <div class="grid-row cols-opp s1-radar-row">
               <div class="panel">
                 <h3>Hiring Trend 2026 by Job Title (n roles)</h3>
-                <div class="split-radar">
-                  <div class="chart-wrap"><canvas id="c-hire-stack"></canvas></div>
-                  <div class="legend-box" id="hire-legend"></div>
-                </div>
+                <div class="legend-box legend-top" id="hire-legend"></div>
+                <div class="chart-wrap"><canvas id="c-hire-stack"></canvas></div>
               </div>
               <div class="panel">
                 <h3>Education Profiles: Replacement Risk and Career Signals (%)</h3>
                 <div class="panel-sub">Each shape is one education level. Farther from centre = higher value. Replacement risk = chance AI automates the role.</div>
-                <div class="split-radar">
-                  <div class="chart-wrap radar-sq"><div id="e-radar" class="echart"></div></div>
-                  <div class="legend-box" id="radar-legend"></div>
-                </div>
+                <div class="legend-box legend-top" id="radar-legend"></div>
+                <div class="chart-wrap radar-sq"><div id="e-radar" class="echart"></div></div>
               </div>
             </div>
           </div>
@@ -999,13 +1006,11 @@
                 <h3>Top Specializations by Avg Job Growth 2030 (%)</h3>
                 <div class="chart-wrap"><canvas id="c-growth"></canvas></div>
               </div>
-              <div class="panel">
+              <div class="panel panel-scatter">
                 <h3>AI Replacement Risk vs Job Growth 2030 (0–1 vs %)</h3>
                 <div class="panel-sub">Each dot is a job title. Right = more likely AI replaces the role. Up = stronger job growth to 2030.</div>
-                <div class="split-legend">
-                  <div class="chart-wrap"><canvas id="c-scatter"></canvas></div>
-                  <div class="legend-box scrollable" id="scatter-legend"></div>
-                </div>
+                <div class="chart-wrap"><canvas id="c-scatter"></canvas></div>
+                <div class="legend-box" id="scatter-legend"></div>
               </div>
             </div>
             <div class="grid-row cols-opp">
@@ -1298,6 +1303,7 @@
         fitStageToViewport();
         sizeRadarSquare();
         fitPanelSubs();
+        document.querySelectorAll('.legend-box.legend-top').forEach(fitTopLegend);
         resizeAllEc();
         Object.keys(charts).forEach(id => {
           if (charts[id] && charts[id].resize) charts[id].resize();
@@ -1471,9 +1477,29 @@
     });
   }
 
+  function fillTopLegend(id, items) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = items.map(it => `
+      <div class="legend-item">
+        <span class="legend-swatch${it.sq ? ' sq' : ''}" style="background:${it.color}"></span>
+        <span><strong>${it.label}</strong>${it.extra ? `<span class="legend-extra"> · ${it.extra}</span>` : ''}</span>
+      </div>
+    `).join('');
+    requestAnimationFrame(() => fitTopLegend(el));
+  }
+
+  function fitTopLegend(el) {
+    if (typeof el === 'string') el = document.getElementById(el);
+    if (!el) return;
+    el.querySelectorAll('.legend-extra').forEach(n => { n.style.display = ''; });
+    const overflows = el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1;
+    if (overflows) el.querySelectorAll('.legend-extra').forEach(n => { n.style.display = 'none'; });
+  }
+
   function renderJobHireStacked(data) {
     const hireOrder = ['Growing', 'Stable', 'Declining'];
-    const hireColors = [COLORS.blue, '#d4c4a0', COLORS.accent];
+    const hireColors = [COLORS.navy, COLORS.blue, COLORS.accent];
     const byJobHire = [...groupBy(data, 'Job_Title').entries()].map(([title, rows]) => {
       const counts = hireOrder.map(h => rows.filter(r => r.Hiring_Trend_2026 === h).length);
       const growN = counts[0];
@@ -1483,7 +1509,7 @@
         n: rows.length,
         growShare: rows.length ? growN / rows.length : 0
       };
-    }).sort((a, b) => b.growShare - a.growShare || a.title.localeCompare(b.title));
+    }).sort((a, b) => b.growShare - a.growShare || b.n - a.n || a.title.localeCompare(b.title));
 
     destroyChart('hireStack');
     charts.hireStack = new Chart(document.getElementById('c-hire-stack'), {
@@ -1521,7 +1547,7 @@
         scales: {
           x: {
             stacked: true,
-            title: { display: true, text: 'Roles (n)', font: { size: 13 } },
+            title: { display: false },
             beginAtZero: true,
             ticks: { font: { size: 13 } }
           },
@@ -1535,12 +1561,12 @@
     });
 
     const totals = hireOrder.map((h, i) => byJobHire.reduce((s, j) => s + j.counts[i], 0));
-    document.getElementById('hire-legend').innerHTML = hireOrder.map((h, i) => `
-      <div class="legend-item">
-        <span><strong>${h}</strong><br>${totals[i].toLocaleString()} roles</span>
-        <span class="legend-swatch sq" style="background:${hireColors[i]}"></span>
-      </div>
-    `).join('');
+    fillTopLegend('hire-legend', hireOrder.map((h, i) => ({
+      label: h,
+      extra: totals[i].toLocaleString(),
+      color: hireColors[i],
+      sq: true
+    })));
   }
 
   function renderSheet1(data) {
@@ -1591,7 +1617,7 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: tipPlugins({ legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } } }),
+        plugins: tipPlugins({ legend: { display: false } }),
         scales: {
           y: {
             title: { display: true, text: 'Percent (%)', font: { size: 13 } },
@@ -1602,6 +1628,11 @@
         }
       }
     });
+
+    fillTopLegend('edu-legend', [
+      { label: 'Avg AI replacement risk (%)', color: COLORS.accent, sq: true },
+      { label: 'Avg Job Growth 2030 (%)', color: COLORS.blue, sq: true }
+    ]);
 
     renderJobHireStacked(data);
 
@@ -1633,7 +1664,7 @@
       }),
       legend: { show: false },
       radar: {
-        center: ['50%', '58%'],
+        center: ['50%', '52%'],
         radius: '78%',
         axisNameGap: 4,
         axisName: { fontSize: 12, color: COLORS.navy, fontWeight: 600, overflow: 'none' },
@@ -1657,12 +1688,10 @@
     });
 
     const radarColors = [COLORS.navy, COLORS.blue, COLORS.gray, COLORS.darkRed];
-    document.getElementById('radar-legend').innerHTML = radarSeries.map((s, i) => `
-      <div class="legend-item">
-        <span><strong>${s.name}</strong><br>Replacement ${s.value[0]}% · Growth ${s.value[1]}%</span>
-        <span class="legend-swatch" style="background:${radarColors[i]}"></span>
-      </div>
-    `).join('');
+    fillTopLegend('radar-legend', radarSeries.map((s, i) => ({
+      label: s.name,
+      color: radarColors[i]
+    })));
 
     const bands = ['0–0.25', '0.25–0.50', '0.50–0.75', '0.75–1.00'];
     const bandColors = [COLORS.blue, COLORS.blue2, COLORS.accent, COLORS.darkRed];
@@ -1673,17 +1702,12 @@
       tooltip: ecTooltip({
         formatter: p => `${p.name}: ${p.value} roles (${p.percent}%)`
       }),
-      legend: {
-        bottom: 0,
-        itemWidth: 8,
-        itemHeight: 8,
-        textStyle: { fontSize: 10, color: COLORS.navy }
-      },
+      legend: { show: false },
       series: [{
         type: 'pie',
         roseType: 'area',
-        radius: ['8%', '58%'],
-        center: ['50%', '44%'],
+        radius: ['10%', '68%'],
+        center: ['50%', '52%'],
         itemStyle: { borderColor: '#fff', borderWidth: 2 },
         label: {
           fontSize: 12,
@@ -1699,6 +1723,11 @@
         data: bands.map((b, i) => ({ name: b, value: counts[b], itemStyle: { color: bandColors[i] } }))
       }]
     });
+    fillTopLegend('rose-legend', bands.map((b, i) => ({
+      label: b,
+      extra: String(counts[b]),
+      color: bandColors[i]
+    })));
 
     const byIndRisk = [...groupBy(data, 'Industry').entries()].map(([k, rows]) => ({
       k, risk: avg(rows, 'AI_Replacement_Risk')
