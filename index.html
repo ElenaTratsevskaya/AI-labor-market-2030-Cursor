@@ -1500,16 +1500,11 @@
   function renderJobHireStacked(data) {
     const hireOrder = ['Growing', 'Stable', 'Declining'];
     const hireColors = [COLORS.navy, COLORS.blue, COLORS.accent];
-    const byJobHire = [...groupBy(data, 'Job_Title').entries()].map(([title, rows]) => {
-      const counts = hireOrder.map(h => rows.filter(r => r.Hiring_Trend_2026 === h).length);
-      const growN = counts[0];
-      return {
-        title,
-        counts,
-        n: rows.length,
-        growShare: rows.length ? growN / rows.length : 0
-      };
-    }).sort((a, b) => b.growShare - a.growShare || b.n - a.n || a.title.localeCompare(b.title)).reverse();
+    const byJobHire = [...groupBy(data, 'Job_Title').entries()].map(([title, rows]) => ({
+      title,
+      counts: hireOrder.map(h => rows.filter(r => r.Hiring_Trend_2026 === h).length),
+      n: rows.length
+    })).sort((a, b) => b.n - a.n || a.title.localeCompare(b.title)).reverse();
 
     destroyChart('hireStack');
     charts.hireStack = new Chart(document.getElementById('c-hire-stack'), {
