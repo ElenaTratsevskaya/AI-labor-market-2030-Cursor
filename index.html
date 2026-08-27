@@ -2,13 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=1920" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>AI Labor Market Transformation 2030</title>
-  <script src="chart.umd.min.js"></script>
-  <script src="echarts.min.js"></script>
   <style>
     :root {
       --c-dark-red: #780000;
@@ -28,7 +26,13 @@
       --pad: 20px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
 
     html, body {
       width: 100%;
@@ -309,7 +313,7 @@
     .kpi {
       background: #fff;
       border: 1px solid #e2d6b8;
-      border-top: 3px solid var(--c-accent);
+      border-top: 3px solid var(--c-navy);
       padding: 8px 10px;
       min-height: 60px;
     }
@@ -334,7 +338,7 @@
 
     .kpi .hint {
       font-size: 11px;
-      color: var(--c-accent);
+      color: var(--c-blue-2);
       margin-top: 3px;
       font-weight: 600;
     }
@@ -400,7 +404,7 @@
     }
 
     /* Sheet 2: same column widths on both rows */
-    .cols-opp { grid-template-columns: 1fr 1.15fr; }
+    .cols-opp { grid-template-columns: 1fr 1fr; }
 
     .panel {
       background: #fff;
@@ -479,7 +483,7 @@
 
     .s1-edu-rose {
       display: grid;
-      grid-template-columns: 1.05fr 1.07fr;
+      grid-template-columns: 1fr 1fr;
       gap: var(--gap);
       min-height: 0;
       min-width: 0;
@@ -745,19 +749,23 @@
       var stage = document.getElementById('app');
       if (!stage) return;
       var sw = 1920, sh = 1080;
+      var cw = document.documentElement.clientWidth || 0;
+      var ch = document.documentElement.clientHeight || 0;
+      var iw = window.innerWidth || 0;
+      var ih = window.innerHeight || 0;
+      var vw = cw && iw ? Math.min(cw, iw) : (cw || iw);
+      var vh = ch && ih ? Math.min(ch, ih) : (ch || ih);
       var vv = window.visualViewport;
-      var vw = Math.min(
-        window.innerWidth || Infinity,
-        document.documentElement.clientWidth || Infinity,
-        vv && vv.width ? vv.width : Infinity
-      );
-      var vh = Math.min(
-        window.innerHeight || Infinity,
-        document.documentElement.clientHeight || Infinity,
-        vv && vv.height ? vv.height : Infinity
-      );
-      if (!isFinite(vw) || !isFinite(vh) || vw < 1 || vh < 1) return;
+      if (vv && vv.width > 1 && vw > 1) {
+        var ratio = vv.width / vw;
+        if (ratio > 0.82 && ratio <= 1.02) {
+          vw = Math.min(vw, vv.width);
+          vh = Math.min(vh, vv.height || vh);
+        }
+      }
+      if (!(vw > 1 && vh > 1)) return;
       var scale = Math.min(vw / sw, vh / sh) * 0.995;
+      if (!(scale > 0) || !isFinite(scale)) return;
       var left = Math.max(0, (vw - sw * scale) / 2);
       var top = Math.max(0, (vh - sh * scale) / 2);
       stage.style.transformOrigin = '0 0';
@@ -781,6 +789,9 @@
     });
     window.addEventListener('pageshow', window.scheduleDashboardFit);
     window.addEventListener('load', window.scheduleDashboardFit);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) window.scheduleDashboardFit();
+    });
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', window.scheduleDashboardFit);
       window.visualViewport.addEventListener('scroll', window.scheduleDashboardFit);
@@ -789,7 +800,6 @@
 </head>
 <body>
   <div class="stage" id="app">
-  <script>window.fitDashboardStage();</script>
     <div class="topbar">
       <div class="topbar-brand">AI × Labor 2030</div>
       <div class="topbar-nav">
@@ -975,6 +985,8 @@
     </div>
   </div>
 
+  <script src="chart.umd.min.js"></script>
+  <script src="echarts.min.js"></script>
   <script>
 (function () {
   const COLORS = {
@@ -1445,7 +1457,7 @@
             beginAtZero: true,
             ticks: { font: { size: 13 } }
           },
-          x: { grid: { display: false }, ticks: { font: { size: 13 } } }
+          x: { grid: { display: false }, ticks: { font: { size: 13 }, maxRotation: 0, minRotation: 0 } }
         }
       }
     });
@@ -2035,6 +2047,7 @@
       setTimeout(scheduleResize, 80);
       setTimeout(scheduleResize, 300);
       setTimeout(scheduleResize, 800);
+      setTimeout(scheduleResize, 1600);
     } catch (err) {
       document.querySelector('.content').innerHTML =
         `<div class="load-error"><strong>Could not load data.</strong><br>
