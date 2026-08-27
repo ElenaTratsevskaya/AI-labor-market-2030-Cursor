@@ -1509,7 +1509,7 @@
         n: rows.length,
         growShare: rows.length ? growN / rows.length : 0
       };
-    }).sort((a, b) => b.growShare - a.growShare || b.n - a.n || a.title.localeCompare(b.title));
+    }).sort((a, b) => b.growShare - a.growShare || b.n - a.n || a.title.localeCompare(b.title)).reverse();
 
     destroyChart('hireStack');
     charts.hireStack = new Chart(document.getElementById('c-hire-stack'), {
