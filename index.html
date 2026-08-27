@@ -363,17 +363,19 @@
 
     .split-radar {
       flex: 1;
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap);
       min-height: 0;
-      gap: 10px;
+      min-width: 0;
       align-items: stretch;
     }
 
     .radar-sq {
-      flex: 0 0 auto;
+      width: 100%;
       height: 100%;
-      width: auto;
-      aspect-ratio: 1 / 1;
+      min-width: 0;
+      min-height: 0;
     }
 
     .split-radar .legend-box {
@@ -423,6 +425,15 @@
       margin-bottom: 2px;
       flex-shrink: 0;
       line-height: 1.2;
+    }
+
+    .panel-sub {
+      font-size: 11px;
+      color: var(--c-blue-2);
+      font-weight: 500;
+      margin-bottom: 4px;
+      flex-shrink: 0;
+      line-height: 1.3;
     }
 
     .chart-wrap {
@@ -873,7 +884,7 @@
         <section class="sheet active" id="s1">
           <div class="sheet-head">
             <div class="sheet-title">Labor Market Transformation &amp; AI Readiness</div>
-            <div class="sheet-sub">Workforce exposure to AI, hiring momentum, education levels and skill demand by 2030</div>
+            <div class="sheet-sub">How likely AI is to replace a role, plus hiring, education and skills to 2030</div>
           </div>
           <div class="source-box">
             <strong>Source:</strong> Kaggle · Dataset author: <strong>UHAMMAD WAQAS</strong>
@@ -884,7 +895,7 @@
             <div class="grid-row cols-opp">
               <div class="s1-edu-rose">
                 <div class="panel">
-                  <h3>Education Level — Avg Risk vs Avg Job Growth</h3>
+                  <h3>Education Level — Avg Replacement Risk vs Job Growth</h3>
                   <div class="chart-wrap"><canvas id="c-edu"></canvas></div>
                 </div>
                 <div class="panel">
@@ -909,7 +920,8 @@
                 <div class="chart-wrap"><div id="e-sankey" class="echart"></div></div>
               </div>
               <div class="panel">
-                <h3>AI Readiness Radar by Education (%)</h3>
+                <h3>Education Profiles: Replacement Risk and Career Signals (%)</h3>
+                <div class="panel-sub">Each shape is one education level. Farther from the centre = higher value. Replacement risk = chance AI automates the role.</div>
                 <div class="split-radar">
                   <div class="chart-wrap radar-sq"><div id="e-radar" class="echart"></div></div>
                   <div class="legend-box" id="radar-legend"></div>
@@ -975,7 +987,7 @@
               <h3>Job Title × Industry (n · 0–1 · % · USD)</h3>
               <div class="matrix-note">
                 Click ▶ to expand industries. Country stays in Filters.
-                Risk — cream → accent red. Growth — navy → blue. Click headers to sort.
+                Replacement risk (AI) — cream → accent red. Growth — navy → blue. Click headers to sort.
               </div>
               <div class="table-wrap" id="table-wrap"></div>
             </div>
@@ -1213,11 +1225,9 @@
 
   function sizeRadarSquare() {
     const el = document.querySelector('.radar-sq');
-    if (!el || !el.parentElement) return;
-    const h = el.parentElement.clientHeight;
-    if (h < 40) return;
-    el.style.width = h + 'px';
-    el.style.height = h + 'px';
+    if (!el) return;
+    el.style.width = '100%';
+    el.style.height = '100%';
   }
 
   function fitStageToViewport() {
@@ -1409,7 +1419,7 @@
     const n = data.length || 1;
 
     document.getElementById('s1-kpi').innerHTML = kpiHTML([
-      { label: 'Avg AI Replacement Risk (0–1)', value: avg(data, 'AI_Replacement_Risk').toFixed(2), hint: '0 = low · 1 = high' },
+      { label: 'Avg AI replacement risk (0–1)', value: avg(data, 'AI_Replacement_Risk').toFixed(2), hint: '0 = unlikely replaced · 1 = likely' },
       { label: 'Avg Future Demand Score (0–1)', value: avg(data, 'Future_Demand_Score').toFixed(2), hint: 'Higher = stronger demand' },
       { label: 'Avg Job Growth 2030 (%)', value: avg(data, 'Job_Growth_2030').toFixed(1) + '%', hint: 'Projected growth rate' },
       { label: 'Upskilling Needed (%)', value: ((upskill / n) * 100).toFixed(0) + '%', hint: `${upskill} of ${data.length} roles` },
@@ -1436,7 +1446,7 @@
         labels: eduOrder,
         datasets: [
           {
-            label: 'Avg AI Replacement Risk (%)',
+            label: 'Avg AI replacement risk (%)',
             data: byEdu.map(x => +x.riskPct.toFixed(1)),
             backgroundColor: COLORS.accent
           },
@@ -1485,7 +1495,7 @@
       color: [COLORS.navy, COLORS.blue, COLORS.accent, COLORS.darkRed],
       tooltip: ecTooltip({
         formatter: p => {
-          const names = ['AI Risk %', 'Job Growth %', 'Demand %', 'High AI Tool %', 'Upskilling %'];
+          const names = ['Replacement risk %', 'Job Growth %', 'Demand %', 'High AI Tool %', 'Upskilling %'];
           const vals = (p.value || []).map((v, i) => `${names[i]}: ${v}`).join('<br>');
           return `<strong>${p.name}</strong><br>${vals}`;
         }
@@ -1493,11 +1503,12 @@
       legend: { show: false },
       radar: {
         center: ['50%', '50%'],
-        radius: '68%',
-        axisName: { fontSize: 11, color: COLORS.navy },
+        radius: '52%',
+        axisNameGap: 14,
+        axisName: { fontSize: 11, color: COLORS.navy, overflow: 'none' },
         splitArea: { areaStyle: { color: ['rgba(253,240,213,0.35)', 'rgba(255,255,255,0.6)'] } },
         indicator: [
-          { name: 'AI Risk %', max: 100 },
+          { name: 'Replacement risk %', max: 100 },
           { name: 'Job Growth %', min: gMin, max: gMax },
           { name: 'Demand %', max: 100 },
           { name: 'High AI Tool %', max: 100 },
@@ -1518,7 +1529,7 @@
     document.getElementById('radar-legend').innerHTML = radarSeries.map((s, i) => `
       <div class="legend-item">
         <span class="legend-swatch" style="background:${radarColors[i]}"></span>
-        <span><strong>${s.name}</strong><br>Risk ${s.value[0]}% · Growth ${s.value[1]}%</span>
+        <span><strong>${s.name}</strong><br>Replacement ${s.value[0]}% · Growth ${s.value[1]}%</span>
       </div>
     `).join('');
 
@@ -1580,7 +1591,7 @@
         plugins: tipPlugins({ legend: { display: false } }),
         scales: {
           x: {
-            title: { display: true, text: 'Avg AI Replacement Risk (0–1)', font: { size: 13 } },
+            title: { display: true, text: 'Avg AI replacement risk (0–1)', font: { size: 13 } },
             min: 0,
             max: 1,
             ticks: { font: { size: 13 } }
@@ -1612,7 +1623,7 @@
         plugins: tipPlugins({ legend: { display: false } }),
         scales: {
           x: {
-            title: { display: true, text: 'Avg AI Replacement Risk (0–1)', font: { size: 13 } },
+            title: { display: true, text: 'Avg AI replacement risk (0–1)', font: { size: 13 } },
             min: 0,
             max: 1,
             ticks: { font: { size: 13 } }
@@ -1656,7 +1667,7 @@
       { label: 'Top Industry by Growth', value: byInd[0] ? byInd[0].k : '—', hint: byInd[0] ? `${byInd[0].growth.toFixed(1)}% avg` : '' },
       { label: 'Top Country by Growth', value: byCty[0] ? byCty[0].k : '—', hint: byCty[0] ? `${byCty[0].growth.toFixed(1)}% avg` : '' },
       { label: 'Growing Roles (n)', value: String(growing), hint: `of ${data.length} filtered roles` },
-      { label: 'Lowest Risk among Growing (0–1)', value: lowRiskGrow ? lowRiskGrow.title : '—', hint: lowRiskGrow ? `Risk ${lowRiskGrow.risk.toFixed(2)}` : '' },
+      { label: 'Lowest replacement risk among Growing (0–1)', value: lowRiskGrow ? lowRiskGrow.title : '—', hint: lowRiskGrow ? `Replacement risk ${lowRiskGrow.risk.toFixed(2)}` : '' },
       { label: 'Median Salary — Top 5 Growth (USD)', value: medSal ? '$' + Math.round(medSal).toLocaleString() : '—' }
     ]);
 
@@ -1708,12 +1719,12 @@
           tooltip: {
             callbacks: {
               title: items => items[0] ? items[0].dataset.label : '',
-              label: ctx => `Risk ${ctx.raw.x} (0–1) · Growth ${ctx.raw.y}%`
+              label: ctx => `Replacement risk ${ctx.raw.x} (0–1) · Growth ${ctx.raw.y}%`
             }
           }
         }),
         scales: {
-          x: { title: { display: true, text: 'Avg AI Replacement Risk', font: { size: 13 } }, min: 0, max: 1, ticks: { font: { size: 13 } } },
+          x: { title: { display: true, text: 'Avg AI replacement risk (0–1)', font: { size: 13 } }, min: 0, max: 1, ticks: { font: { size: 13 } } },
           y: { title: { display: true, text: 'Avg Job Growth 2030 (%)', font: { size: 13 } }, ticks: { font: { size: 13 } } }
         }
       }
@@ -1897,7 +1908,7 @@
     const cols = [
       ['name', 'Job Title / Industry'],
       ['n', 'Roles (n)'],
-      ['risk', 'AI Risk (0–1)'],
+      ['risk', 'Replacement AI (0–1)'],
       ['demand', 'Demand (0–1)'],
       ['growth', 'Growth 2030 (%)'],
       ['salary', 'Salary (USD)'],
@@ -1960,7 +1971,7 @@
 
     document.getElementById('s3-kpi').innerHTML = kpiHTML([
       { label: 'Roles (n)', value: data.length.toLocaleString(), hint: 'after filters' },
-      { label: 'Avg AI Replacement Risk (0–1)', value: avg(data, 'AI_Replacement_Risk').toFixed(2), hint: '0 = low · 1 = high' },
+      { label: 'Avg AI replacement risk (0–1)', value: avg(data, 'AI_Replacement_Risk').toFixed(2), hint: '0 = unlikely replaced · 1 = likely' },
       { label: 'Growing Hiring 2026 (%)', value: ((growing / n) * 100).toFixed(0) + '%', hint: `${growing} roles` },
       { label: 'Avg Job Growth 2030 (%)', value: avg(data, 'Job_Growth_2030').toFixed(1) + '%', hint: 'projected rate' },
       { label: 'Avg Salary (USD)', value: '$' + Math.round(avg(data, 'Average_Salary_USD')).toLocaleString(), hint: 'mean of filtered roles' },
