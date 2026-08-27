@@ -1560,10 +1560,8 @@
       }
     });
 
-    const totals = hireOrder.map((h, i) => byJobHire.reduce((s, j) => s + j.counts[i], 0));
     fillTopLegend('hire-legend', hireOrder.map((h, i) => ({
       label: h,
-      extra: totals[i].toLocaleString(),
       color: hireColors[i],
       sq: true
     })));
@@ -1654,7 +1652,7 @@
     const gMin = Math.min(0, ...radarSeries.map(s => s.value[1]));
     sizeRadarSquare();
     setEc('e-radar', {
-      color: [COLORS.navy, COLORS.blue, COLORS.gray, COLORS.darkRed],
+      color: [COLORS.navy, COLORS.blue, '#9aa3a8', COLORS.darkRed],
       tooltip: ecTooltip({
         formatter: p => {
           const names = ['Replacement risk %', 'Job Growth %', 'Demand %', 'High AI Tool %', 'Upskilling %'];
@@ -1687,7 +1685,7 @@
       }]
     });
 
-    const radarColors = [COLORS.navy, COLORS.blue, COLORS.gray, COLORS.darkRed];
+    const radarColors = [COLORS.navy, COLORS.blue, '#9aa3a8', COLORS.darkRed];
     fillTopLegend('radar-legend', radarSeries.map((s, i) => ({
       label: s.name,
       color: radarColors[i]
@@ -1851,7 +1849,7 @@
         maintainAspectRatio: false,
         plugins: tipPlugins({ legend: { display: false } }),
         scales: {
-          x: { title: { display: true, text: 'Avg Job Growth 2030 (%)', font: { size: 13 } }, ticks: { font: { size: 13 } } },
+          x: { title: { display: false }, ticks: { font: { size: 13 } } },
           y: { grid: { display: false }, ticks: { color: COLORS.navy, font: { size: 13, weight: '600' } } }
         }
       }
@@ -1953,7 +1951,7 @@
         maintainAspectRatio: false,
         plugins: tipPlugins({ legend: { display: false } }),
         scales: {
-          x: { title: { display: true, text: 'Avg growth (%)', font: { size: 13 } }, ticks: { font: { size: 13 } } },
+          x: { title: { display: false }, ticks: { font: { size: 13 } } },
           y: { grid: { display: false }, ticks: { color: COLORS.navy, font: { size: 12, weight: '600' } } }
         }
       }
@@ -1976,7 +1974,7 @@
         maintainAspectRatio: false,
         plugins: tipPlugins({ legend: { display: false } }),
         scales: {
-          x: { title: { display: true, text: 'Avg growth (%)', font: { size: 13 } }, ticks: { font: { size: 13 } } },
+          x: { title: { display: false }, ticks: { font: { size: 13 } } },
           y: { grid: { display: false }, ticks: { color: COLORS.navy, font: { size: 12, weight: '600' } } }
         }
       }
