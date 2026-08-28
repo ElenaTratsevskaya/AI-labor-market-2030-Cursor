@@ -35,7 +35,7 @@ AI-powered interactive dashboard built with Cursor</br></br>
 <img width="1607" height="906" alt="53-2" src="https://github.com/user-attachments/assets/f6dea52e-31ac-4c06-903c-ff56f810dfaa" />
 
 
-Лист 3. Skills, Hiring Flow & Role Matrix, вариант с выбранными фильтрами
+Лист 3. Skills, Hiring Flow & Role Matrix, вариант с раскрытой матрицей
 <img width="1609" height="906" alt="53-3" src="https://github.com/user-attachments/assets/5f6618cc-4141-4290-ae8a-9b10c8f6c2f8" />
 
 ## Стек </br>
