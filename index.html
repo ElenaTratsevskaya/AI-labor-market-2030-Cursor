@@ -178,7 +178,7 @@
       color: var(--c-navy);
       border: 1px solid var(--c-blue-2);
       padding: 7px 10px;
-      font-size: 12px;
+      font-size: 13px;
       line-height: 1.4;
       border-radius: 2px;
       overflow: hidden;
@@ -194,6 +194,7 @@
 
     .filter-group select option {
       padding: 3px 6px;
+      font-size: 13px;
     }
 
     /* Top 4: same height; Education fits 4 rows */
@@ -1695,8 +1696,9 @@
     const counts = Object.fromEntries(bands.map(b => [b, 0]));
     data.forEach(r => { counts[riskBand(r.AI_Replacement_Risk)]++; });
     const roseTotal = bands.reduce((s, b) => s + counts[b], 0);
+    const roseTotalLabel = String(roseTotal).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
     const roseCenter = ['50%', '52%'];
-    const roseInner = '38%';
+    const roseInner = '32%';
     setEc('e-rose', {
       color: bandColors,
       tooltip: ecTooltip({
@@ -1707,7 +1709,7 @@
         {
           type: 'pie',
           roseType: 'area',
-          radius: [roseInner, '72%'],
+          radius: [roseInner, '70%'],
           center: roseCenter,
           itemStyle: { borderColor: '#fff', borderWidth: 2 },
           label: {
@@ -1733,14 +1735,14 @@
           label: {
             show: true,
             position: 'center',
-            formatter: `{total|${roseTotal}}\n{sub|roles}`,
+            formatter: `{total|${roseTotalLabel}}\n{sub|roles}`,
             rich: {
               total: {
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: 700,
                 color: COLORS.navy,
                 fontFamily: "'Segoe UI', Tahoma, sans-serif",
-                lineHeight: 26
+                lineHeight: 24
               },
               sub: {
                 fontSize: 11,
@@ -2240,7 +2242,23 @@
 
   function bindFilters() {
     ['f-ai', 'f-hire', 'f-edu', 'f-size', 'f-ind', 'f-cty'].forEach(id => {
-      document.getElementById(id).addEventListener('change', refresh);
+      const sel = document.getElementById(id);
+      let prev = [];
+      sel.addEventListener('pointerdown', () => {
+        prev = Array.from(sel.options).map(o => o.selected);
+      });
+      sel.addEventListener('change', () => {
+        if (window.matchMedia('(pointer: coarse)').matches) {
+          const allPrev = prev.length > 0 && prev.every(Boolean);
+          if (allPrev) {
+            const flipped = Array.from(sel.options).filter((o, i) => o.selected !== prev[i]);
+            if (flipped.length === 1 && !flipped[0].selected) {
+              Array.from(sel.options).forEach(o => { o.selected = o === flipped[0]; });
+            }
+          }
+        }
+        refresh();
+      });
     });
     document.getElementById('btn-reset').addEventListener('click', () => {
       ['f-ai', 'f-hire', 'f-edu', 'f-size', 'f-ind', 'f-cty'].forEach(id => {
