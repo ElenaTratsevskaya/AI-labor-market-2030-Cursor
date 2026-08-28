@@ -20,19 +20,23 @@ AI-powered interactive dashboard built with Cursor</br></br>
 - Локальный запуск без установки сервера разработки — `start_dashboard.bat` или любой статический хостинг (GitHub Pages / Netlify) с **всеми четырьмя файлами** рядом.</br></br>
 
 Лист 1. Labor Market Transformation & AI Readiness
-<img width="1588" height="901" alt="01" src="https://github.com/user-attachments/assets/68658776-a25d-4d2e-ae9c-df509dbd1e80" />
+<img width="1607" height="903" alt="51" src="https://github.com/user-attachments/assets/5c04349e-f267-4407-84ff-01b5af2bf3bc" />
 
 Лист 1. Labor Market Transformation & AI Readiness, вариант с выбранными фильтрами
-<img width="1597" height="900" alt="02" src="https://github.com/user-attachments/assets/ce60db69-e4b0-4991-ac15-1bad47e30291" />
-
-Лист 1. Labor Market Transformation & AI Readiness, вариант с выбранными фильтрами
-<img width="1602" height="899" alt="03" src="https://github.com/user-attachments/assets/9b47aa7b-c2bb-49f1-b9c3-89d6062c8e69" />
+<img width="1610" height="907" alt="51-1" src="https://github.com/user-attachments/assets/d01519c3-62c3-4821-892d-2bbacf72609d" />
 
 Лист 2. Growth Opportunities: Roles, Industries & Countries
-<img width="1596" height="901" alt="04" src="https://github.com/user-attachments/assets/78ce1ff6-267d-47ad-8e35-a3e779a46d1c" />
+<img width="1607" height="905" alt="52" src="https://github.com/user-attachments/assets/8ed78c70-7578-40b3-894a-65e63ebcf6f4" />
+
+Лист 2. Growth Opportunities: Roles, Industries & Countries, вариант с выбранными фильтрами
+<img width="1608" height="906" alt="52-2" src="https://github.com/user-attachments/assets/974a62da-836a-44c1-8cfc-00222a2548c2" />
 
 Лист 3. Skills, Hiring Flow & Role Matrix
-<img width="1596" height="902" alt="05" src="https://github.com/user-attachments/assets/e2a90e0a-6625-413f-9e4a-efaa6733f7e7" />
+<img width="1607" height="906" alt="53-2" src="https://github.com/user-attachments/assets/f6dea52e-31ac-4c06-903c-ff56f810dfaa" />
+
+
+Лист 3. Skills, Hiring Flow & Role Matrix, вариант с выбранными фильтрами
+<img width="1609" height="906" alt="53-3" src="https://github.com/user-attachments/assets/5f6618cc-4141-4290-ae8a-9b10c8f6c2f8" />
 
 ## Стек </br>
 HTML · CSS · JavaScript · Chart.js · ECharts · CSV  </br></br>
