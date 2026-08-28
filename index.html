@@ -469,9 +469,9 @@
       grid-row: 1 / -1;
       justify-content: flex-start;
       overflow: hidden;
-      font-size: 10px;
-      line-height: 1.2;
-      gap: 1px;
+      font-size: 11px;
+      line-height: 1.25;
+      gap: 2px;
       padding-top: 0;
     }
 
@@ -549,6 +549,10 @@
       min-height: 0;
       min-width: 0;
       height: 100%;
+    }
+
+    .pair-charts h3 {
+      white-space: nowrap;
     }
 
     .heatmap-wrap {
@@ -972,7 +976,7 @@
                   <div class="chart-wrap"><canvas id="c-risk-ind"></canvas></div>
                 </div>
                 <div class="panel">
-                  <h3>AI Replacement Risk by Job Title (0–1)</h3>
+                  <h3>AI Replacement Risk by Job Title (Top 10, 0–1)</h3>
                   <div class="chart-wrap"><canvas id="c-risk-job"></canvas></div>
                 </div>
               </div>
@@ -1690,31 +1694,75 @@
     const bandColors = [COLORS.blue, COLORS.blue2, COLORS.accent, COLORS.darkRed];
     const counts = Object.fromEntries(bands.map(b => [b, 0]));
     data.forEach(r => { counts[riskBand(r.AI_Replacement_Risk)]++; });
+    const roseTotal = bands.reduce((s, b) => s + counts[b], 0);
+    const roseCenter = ['50%', '52%'];
+    const roseInner = '38%';
     setEc('e-rose', {
       color: bandColors,
       tooltip: ecTooltip({
         formatter: p => `${p.name}: ${p.value} roles (${p.percent}%)`
       }),
       legend: { show: false },
-      series: [{
-        type: 'pie',
-        roseType: 'area',
-        radius: ['10%', '68%'],
-        center: ['50%', '52%'],
-        itemStyle: { borderColor: '#fff', borderWidth: 2 },
-        label: {
-          fontSize: 12,
-          color: COLORS.navy,
-          formatter: '{c}',
-          distanceToLabelLine: 2
+      series: [
+        {
+          type: 'pie',
+          roseType: 'area',
+          radius: [roseInner, '72%'],
+          center: roseCenter,
+          itemStyle: { borderColor: '#fff', borderWidth: 2 },
+          label: {
+            fontSize: 12,
+            color: COLORS.navy,
+            formatter: '{c}',
+            distanceToLabelLine: 2
+          },
+          labelLine: {
+            show: true,
+            length: 6,
+            length2: 4
+          },
+          data: bands.map((b, i) => ({ name: b, value: counts[b], itemStyle: { color: bandColors[i] } }))
         },
-        labelLine: {
-          show: true,
-          length: 6,
-          length2: 4
-        },
-        data: bands.map((b, i) => ({ name: b, value: counts[b], itemStyle: { color: bandColors[i] } }))
-      }]
+        {
+          type: 'pie',
+          radius: ['0%', roseInner],
+          center: roseCenter,
+          silent: true,
+          z: 10,
+          tooltip: { show: false },
+          label: {
+            show: true,
+            position: 'center',
+            formatter: `{total|${roseTotal}}\n{sub|roles}`,
+            rich: {
+              total: {
+                fontSize: 22,
+                fontWeight: 700,
+                color: COLORS.navy,
+                fontFamily: "'Segoe UI', Tahoma, sans-serif",
+                lineHeight: 26
+              },
+              sub: {
+                fontSize: 11,
+                fontWeight: 600,
+                color: COLORS.navy,
+                fontFamily: "'Segoe UI', Tahoma, sans-serif",
+                lineHeight: 16
+              }
+            }
+          },
+          labelLine: { show: false },
+          data: [{
+            value: 1,
+            name: 'Total',
+            itemStyle: {
+              color: COLORS.cream,
+              borderColor: COLORS.cream2,
+              borderWidth: 1
+            }
+          }]
+        }
+      ]
     });
     fillTopLegend('rose-legend', bands.map((b, i) => ({
       label: b,
@@ -1824,8 +1872,8 @@
       { label: 'Median Salary — Top 5 Growth (USD)', value: medSal ? '$' + Math.round(medSal).toLocaleString() : '—' }
     ]);
 
-    /* Top 10 bars: palette gradient by growth rank (not rainbow) */
-    const top10 = byJob.slice(0, 10).reverse();
+    /* Top 10: descending (highest at top). High growth = navy, low = burgundy. */
+    const top10 = byJob.slice(0, 10);
     destroyChart('growth');
     charts.growth = new Chart(document.getElementById('c-growth'), {
       type: 'bar',
