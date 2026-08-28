@@ -373,6 +373,57 @@
       min-height: 0;
     }
 
+    .split-radar {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr max-content;
+      gap: 6px;
+      min-height: 0;
+      min-width: 0;
+      align-items: stretch;
+    }
+
+    .split-radar .legend-box {
+      width: max-content;
+      justify-content: center;
+      align-items: flex-end;
+      overflow: visible;
+      font-size: 12px;
+      text-align: right;
+      border-left: 1px solid var(--c-cream-3);
+      padding-left: 8px;
+      padding-right: 0;
+      gap: 8px;
+    }
+
+    .split-radar .legend-item {
+      justify-content: flex-end;
+      text-align: right;
+      white-space: nowrap;
+      width: 100%;
+      align-items: flex-start;
+    }
+
+    .split-radar .legend-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .split-radar .legend-swatch {
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+
+    .split-radar .legend-sub {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #2a5270;
+      line-height: 1.25;
+      margin-top: 1px;
+    }
+
     .s1-flow {
       display: grid;
       grid-template-columns: 1.4fr 0.85fr;
@@ -991,8 +1042,10 @@
               <div class="panel">
                 <h3>Education Profiles: Replacement Risk and Career Signals (%)</h3>
                 <div class="panel-sub">Each shape is one education level. Farther from centre = higher value. Replacement risk = chance AI automates the role.</div>
-                <div class="legend-box legend-top" id="radar-legend"></div>
-                <div class="chart-wrap radar-sq"><div id="e-radar" class="echart"></div></div>
+                <div class="split-radar">
+                  <div class="chart-wrap radar-sq"><div id="e-radar" class="echart"></div></div>
+                  <div class="legend-box" id="radar-legend"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -1662,8 +1715,8 @@
       }),
       legend: { show: false },
       radar: {
-        center: ['50%', '52%'],
-        radius: '78%',
+        center: ['50%', '55%'],
+        radius: '82%',
         axisNameGap: 4,
         axisName: { fontSize: 12, color: COLORS.navy, fontWeight: 600, overflow: 'none' },
         splitArea: { areaStyle: { color: ['rgba(253,240,213,0.35)', 'rgba(255,255,255,0.6)'] } },
@@ -1686,10 +1739,18 @@
     });
 
     const radarColors = [COLORS.navy, COLORS.blue, '#9aa3a8', COLORS.darkRed];
-    fillTopLegend('radar-legend', radarSeries.map((s, i) => ({
-      label: s.name,
-      color: radarColors[i]
-    })));
+    const radarLegend = document.getElementById('radar-legend');
+    if (radarLegend) {
+      radarLegend.innerHTML = radarSeries.map((s, i) => `
+        <div class="legend-item">
+          <span class="legend-text">
+            <strong>${s.name}</strong>
+            <span class="legend-sub">Replacement ${s.value[0]}% · Growth ${s.value[1]}%</span>
+          </span>
+          <span class="legend-swatch" style="background:${radarColors[i]}"></span>
+        </div>
+      `).join('');
+    }
 
     const bands = ['0–0.25', '0.25–0.50', '0.50–0.75', '0.75–1.00'];
     const bandColors = [COLORS.blue, COLORS.blue2, COLORS.accent, COLORS.darkRed];
