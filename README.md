@@ -1,4 +1,4 @@
-# AI-labor-market-2030-Cursor
+# AI-project_labor-market-2030_Cursor
 AI-powered interactive dashboard built with Cursor</br></br>
 
 Интерактивный дашборд о влиянии искусственного интеллекта на рынок труда к 2030 году.  </br>
